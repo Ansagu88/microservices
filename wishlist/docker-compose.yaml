@@ -1,0 +1,55 @@
+version: "3.8"
+services:
+  # Django app
+  backend_wishlist:
+    container_name: lilthi_ms_wishlist
+    build: .
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8002"
+    volumes:
+      - .:/app
+    ports:
+      - "8002:8002"
+    # networks:
+    #   - lilthi_net  # Agregamos el enlace de red personalizado
+    depends_on:
+      - db_wishlist
+      - redis_wishlist
+    # command: ["./wait-for-it.sh", "db_wishlist:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+  # Event Queue Kafka
+  car_queue:
+    build: .
+    command: >
+      sh -c "python consumer.py"
+    depends_on:
+      - db_wishlist
+  # PostgreSQL
+  db_wishlist:
+    container_name: django_db_wishlist_postgres
+    # hostname: db_wishlist
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=lilthi
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=lilthi_wishlist_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    # networks:
+    #   - lilthi_net  # Agregamos el enlace de red personalizado
+
+  # Redis
+  redis_wishlist:
+    container_name: django_wishlist_redis
+    image: redis:latest
+    ports:
+      - "6385:6379"
+    # networks:
+    #   - lilthi_net  # Agregamos el enlace de red personalizado
+
+# Agregamos la definición de la red personalizada
+# networks:
+#   lilthi_net:
+#     driver: bridge
