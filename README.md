@@ -10,7 +10,7 @@ User management, including creating, updating and deleting user accounts. These 
 How to run
 To run this service, use the docker-compose up command in the auth/ directory.
 
-## cart
+## Cart
 The cart microservice is located in the cart/ directory. This service is responsible for managing the users' shopping cart.
 
 ### Principal functions
@@ -18,7 +18,7 @@ Shopping cart management, including adding and deleting products.
 How to run
 To run this service, use the docker-compose up command in the cart/ directory.
 
-## wishlist
+## Wishlist
 The wishlist microservice is located in the wishlist/ directory. This service is responsible for managing the users' wish list.
 
 ### Principal functions
