@@ -34,6 +34,21 @@ def user_banner_directory_path(instance, filename):
     
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
+        """
+        Create a new user with the given email and password.
+
+        Args:
+            email (str): The email address of the user.
+            password (str, optional): The password for the user. If not provided, a random password will be generated.
+            **extra_fields: Additional fields to be saved in the user model.
+
+        Returns:
+            User: The newly created user object.
+
+        Raises:
+            ValueError: If the email is not provided or if the username contains special characters.
+
+        """
         if not email:
             raise ValueError('Users must have an email address')
         email = self.normalize_email(email)
@@ -144,7 +159,13 @@ class UserAccountManager(BaseUserManager):
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
-    roles = (   
+    """
+    Represents a user account in the system.
+
+    Inherits from AbstractBaseUser and PermissionsMixin.
+    """
+
+    roles = (
         ('customer', 'Customer'),
         ('seller', 'Seller'),
         ('admin', 'Admin'),
@@ -152,7 +173,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
         ('helper', 'Helper'),
         ('editor', 'Editor'),
     )
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     stripe_customer_id = models.CharField(max_length=100, blank=True, null=True)
@@ -168,7 +189,6 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     agreed = models.BooleanField(default=False)
 
-
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -182,14 +202,26 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'agreed']
 
     def save(self, *args, **kwargs):
+        """
+        Saves the user account.
+
+        Generates a unique slug for the user based on the username.
+        If a slug with the same value already exists, appends a counter to make it unique.
+        """
         self.slug = slugify(self.username)
-        counter = 1    
+        counter = 1
         while UserAccount.objects.filter(slug=self.slug).exists():
             self.slug = f"{(self.slug)}-{counter}"
-            counter += 1    
+            counter += 1
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """
+        Returns a string representation of the user account.
+
+        Returns:
+            str: The email address of the user.
+        """
         return self.email
     
 

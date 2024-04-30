@@ -12,6 +12,32 @@ django.setup()
 
 
 class UserAccountTests(TestCase):
+    """
+    Test case class for testing the UserAccount model and its related functionality.
+    """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = UserAccount.objects.create_user(
+            email='testuser@example.com',
+            password='testpass123',
+            username='testuser',
+            first_name='Test',
+            last_name='User',
+            agreed=True,
+        )
+        self.admin_user = UserAccount.objects.create_superuser(
+            email='admin@example.com',
+            password='adminpass123',
+            username='adminuser',
+            first_name='Admin',
+            last_name='User',
+            agreed=True,
+        )
+        self.client.force_authenticate(user=self.user)
+
+    # Rest of the test methods...
+class UserAccountTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = UserAccount.objects.create_user(
